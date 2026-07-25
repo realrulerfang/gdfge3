@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,19 +10,18 @@
 <script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
 <style>
   :root{
-    --bg:#04050a;
-    --ink:#EAEEF6;
-    --muted:#8A93A6;
-    --muted-2:#5C6478;
-    --panel:rgba(10,13,22,0.52);
-    --panel-solid:#0A0D16;
-    --border:rgba(234,238,246,0.10);
-    --border-strong:rgba(234,238,246,0.18);
-    --amber:#FF8A3D;
-    --amber-dim:rgba(255,138,61,0.14);
-    --cyan:#57E0E8;
-    --green:#6EE7A0;
-    --red:#FF5C5C;
+    --bg:#0A0D18;
+    --ink:#ECEFF6;
+    --muted:#8A93A9;
+    --muted-2:#565E72;
+    --panel:rgba(13,17,29,0.55);
+    --panel-solid:#0D111D;
+    --border:rgba(236,239,246,0.09);
+    --border-strong:rgba(236,239,246,0.16);
+    --accent:#4CFFB0;
+    --accent-dim:rgba(76,255,176,0.12);
+    --cyan:#5CD8FF;
+    --red:#FF6161;
     --radius:2px;
     --font-display:'Space Grotesk', sans-serif;
     --font-body:'Inter', sans-serif;
@@ -45,8 +44,9 @@
     inset:0;
     width:100vw;
     height:100vh;
-    z-index:-2;
+    z-index:-3;
     pointer-events:none;
+    background:var(--bg);
   }
   spline-viewer{
     width:100%;
@@ -56,26 +56,26 @@
   #bg-veil{
     position:fixed;
     inset:0;
-    z-index:-1;
+    z-index:-2;
     pointer-events:none;
     background:
-      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(4,5,10,0.15), rgba(4,5,10,0.75) 55%),
-      linear-gradient(180deg, rgba(4,5,10,0.35) 0%, rgba(4,5,10,0.15) 20%, rgba(4,5,10,0.55) 70%, var(--bg) 100%);
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(10,13,24,0.10), rgba(10,13,24,0.72) 55%),
+      linear-gradient(180deg, rgba(10,13,24,0.30) 0%, rgba(10,13,24,0.10) 20%, rgba(10,13,24,0.55) 70%, var(--bg) 100%);
   }
   #grid-overlay{
     position:fixed;
     inset:0;
     z-index:-1;
     pointer-events:none;
-    opacity:0.35;
+    opacity:0.3;
     background-image:
-      linear-gradient(rgba(234,238,246,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(234,238,246,0.035) 1px, transparent 1px);
+      linear-gradient(rgba(236,239,246,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(236,239,246,0.035) 1px, transparent 1px);
     background-size:64px 64px;
     mask-image:radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent 75%);
   }
 
-  ::selection{background:var(--amber);color:#1a1000;}
+  ::selection{background:var(--accent);color:#04140C;}
 
   a{color:inherit;text-decoration:none;}
   .mono{font-family:var(--font-mono);}
@@ -91,7 +91,7 @@
     position:fixed;
     top:0;left:0;right:0;
     z-index:100;
-    background:rgba(4,5,10,0.55);
+    background:rgba(10,13,24,0.55);
     backdrop-filter:blur(14px) saturate(140%);
     -webkit-backdrop-filter:blur(14px) saturate(140%);
     border-bottom:1px solid var(--border);
@@ -116,8 +116,8 @@
   .brand-dot{
     width:8px;height:8px;
     border-radius:50%;
-    background:var(--amber);
-    box-shadow:0 0 8px var(--amber), 0 0 16px rgba(255,138,61,0.5);
+    background:var(--accent);
+    box-shadow:0 0 8px var(--accent), 0 0 16px rgba(76,255,176,0.5);
     animation:pulse 2.4s ease-in-out infinite;
   }
   @keyframes pulse{
@@ -160,14 +160,14 @@
     cursor:pointer;
   }
   .btn-primary{
-    background:var(--amber);
-    color:#1a0f05;
-    border-color:var(--amber);
+    background:var(--accent);
+    color:#04140C;
+    border-color:var(--accent);
     font-weight:600;
   }
   .btn-primary:hover{
-    background:#ffa563;
-    box-shadow:0 0 24px rgba(255,138,61,0.35);
+    background:#7BFFC5;
+    box-shadow:0 0 24px rgba(76,255,176,0.35);
   }
   .btn-ghost{
     background:rgba(255,255,255,0.02);
@@ -192,9 +192,9 @@
   }
   .hud-corner{
     position:absolute;
-    width:28px;height:28px;
+    width:26px;height:26px;
     border:1px solid var(--border-strong);
-    opacity:0.6;
+    opacity:0.5;
   }
   .hud-corner.tl{top:100px;left:32px;border-right:none;border-bottom:none;}
   .hud-corner.tr{top:100px;right:32px;border-left:none;border-bottom:none;}
@@ -221,20 +221,20 @@
   .eyebrow .live-dot{
     width:6px;height:6px;
     border-radius:50%;
-    background:var(--green);
-    box-shadow:0 0 6px var(--green);
+    background:var(--accent);
+    box-shadow:0 0 6px var(--accent);
     animation:pulse 2s ease-in-out infinite;
   }
   .hero h1{
     font-family:var(--font-display);
     font-weight:700;
-    font-size:clamp(38px, 6.5vw, 78px);
-    line-height:1.04;
+    font-size:clamp(36px, 6vw, 74px);
+    line-height:1.06;
     letter-spacing:-0.01em;
-    max-width:920px;
+    max-width:900px;
     margin-bottom:26px;
   }
-  .hero h1 .accent{color:var(--amber);}
+  .hero h1 .accent-text{color:var(--accent);}
   .hero-sub{
     font-size:17.5px;
     color:var(--muted);
@@ -300,7 +300,7 @@
     font-size:12px;
     letter-spacing:0.12em;
     text-transform:uppercase;
-    color:var(--amber);
+    color:var(--accent);
     margin-bottom:16px;
     display:flex;
     align-items:center;
@@ -309,7 +309,7 @@
   .section-eyebrow::before{
     content:'';
     width:22px;height:1px;
-    background:var(--amber);
+    background:var(--accent);
   }
   .section-head h2{
     font-family:var(--font-display);
@@ -367,7 +367,7 @@
   .article-glyph{
     font-family:var(--font-mono);
     font-size:12px;
-    color:var(--amber);
+    color:var(--accent);
     margin-bottom:10px;
     letter-spacing:0.06em;
   }
@@ -378,7 +378,7 @@
     line-height:1.3;
     margin-bottom:14px;
   }
-  .article-card h3 em{color:var(--amber);font-style:normal;}
+  .article-card h3 em{color:var(--accent);font-style:normal;}
   .article-card p{
     color:var(--muted);
     font-size:14.5px;
@@ -414,14 +414,14 @@
     color:var(--muted);
   }
   .tag.on{
-    border-color:rgba(110,231,160,0.4);
-    color:var(--green);
-    background:rgba(110,231,160,0.06);
+    border-color:rgba(76,255,176,0.4);
+    color:var(--accent);
+    background:rgba(76,255,176,0.06);
   }
   .tag.off{
-    border-color:rgba(255,92,92,0.35);
+    border-color:rgba(255,97,97,0.35);
     color:var(--red);
-    background:rgba(255,92,92,0.06);
+    background:rgba(255,97,97,0.06);
   }
   .mode-card h4{
     font-family:var(--font-display);
@@ -495,7 +495,7 @@
   .os-dl{
     font-family:var(--font-mono);
     font-size:12px;
-    color:var(--amber);
+    color:var(--accent);
     display:flex;
     align-items:center;
     gap:6px;
@@ -561,7 +561,7 @@
   .copy-btn{
     font-family:var(--font-mono);
     font-size:11px;
-    color:var(--amber);
+    color:var(--accent);
     border:1px solid var(--border-strong);
     padding:6px 12px;
     border-radius:var(--radius);
@@ -569,7 +569,7 @@
     background:transparent;
     transition:all 0.2s;
   }
-  .copy-btn:hover{background:var(--amber-dim);}
+  .copy-btn:hover{background:var(--accent-dim);}
   .token-actions{display:flex;gap:12px;flex-wrap:wrap;}
   .token-disclaimer{
     font-family:var(--font-mono);
@@ -596,7 +596,7 @@
   .faq-q .qnum{
     font-family:var(--font-mono);
     font-size:12px;
-    color:var(--amber);
+    color:var(--accent);
     margin-right:14px;
   }
   .faq-q h4{
@@ -612,7 +612,7 @@
     transition:transform 0.25s;
     flex-shrink:0;
   }
-  .faq-item.open .faq-toggle{transform:rotate(45deg);color:var(--amber);}
+  .faq-item.open .faq-toggle{transform:rotate(45deg);color:var(--accent);}
   .faq-a{
     max-height:0;
     overflow:hidden;
@@ -639,7 +639,7 @@
     margin-bottom:36px;
     line-height:1.15;
   }
-  .final-cta h2 em{color:var(--amber);font-style:normal;}
+  .final-cta h2 em{color:var(--accent);font-style:normal;}
   .final-actions{
     display:flex;
     gap:14px;
@@ -701,15 +701,15 @@
   <nav>
     <div class="brand"><span class="brand-dot"></span>VEX</div>
     <div class="nav-links">
-      <a href="#what">Система</a>
-      <a href="#modes">Режимы</a>
-      <a href="#memory">Память</a>
+      <a href="#what">System</a>
+      <a href="#modes">Modes</a>
+      <a href="#memory">Memory</a>
       <a href="#token">$VEX</a>
       <a href="#faq">FAQ</a>
     </div>
     <div class="nav-cta">
       <a href="#token" class="btn btn-ghost btn-sm">$VEX</a>
-      <a href="#download" class="btn btn-primary btn-sm">Скачать</a>
+      <a href="#download" class="btn btn-primary btn-sm">Download</a>
     </div>
   </nav>
 </header>
@@ -722,19 +722,19 @@
 
   <div class="eyebrow"><span class="live-dot"></span>$VEX LIVE · ROBINHOOD CHAIN · VIA VIRTUALS</div>
 
-  <h1>Хватит нянчиться с каждой сделкой.<br><span class="accent">Шлюз безопасности не уходит на перерыв.</span></h1>
+  <h1>Stop babysitting every trade.<br><span class="accent-text">The safety gate never clocks out.</span></h1>
 
-  <p class="hero-sub">Торговый рантайм, который живёт на вашей машине. Режим «миссии» работает без присмотра сутками — но каждый своп и мост проходят один и тот же fail-closed шлюз, всегда.</p>
+  <p class="hero-sub">A trading runtime that lives on your machine. Mission mode runs unattended for days — every swap and bridge still clears the same fail-closed gate either way.</p>
 
   <div class="hero-actions">
-    <a href="#download" class="btn btn-primary">Скачать для macOS / Linux</a>
-    <a href="#token" class="btn btn-ghost">Купить $VEX ↗</a>
+    <a href="#download" class="btn btn-primary">Download for macOS / Linux</a>
+    <a href="#token" class="btn btn-ghost">Buy $VEX ↗</a>
   </div>
 
   <div class="hero-meta">
-    <a href="#">Свободный и open source ↗</a>
+    <a href="#">Free and open source ↗</a>
     <span class="sep">·</span>
-    <a href="#">Запущен через Virtuals</a>
+    <a href="#">Launched via Virtuals</a>
     <span class="sep">·</span>
     <a href="#">Robinhood Chain</a>
   </div>
@@ -758,29 +758,29 @@
 <section id="what">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Архитектура системы</div>
-      <h2>Не чат-бот. Рантайм, который исполняет миссии.</h2>
-      <p>VEX запускает реальные торговые миссии на реальных рынках — по правилам, которые модель не может обойти.</p>
+      <div class="section-eyebrow">What VEX is</div>
+      <h2>Not a chatbot. A runtime that executes missions.</h2>
+      <p>VEX runs real missions against real markets — under rules the model cannot override.</p>
     </div>
 
     <div class="articles reveal">
       <div class="article-card">
-        <div class="article-num">Статья I</div>
+        <div class="article-num">Article I</div>
         <div class="article-glyph">// ENFORCE</div>
-        <h3>Ничто не торгует мимо <em>шлюза безопасности.</em></h3>
-        <p>Каждый своп и мост проходят одну и ту же fail-closed проверку перед исполнением — независимо от того, ограничен агент или работает в полной автономии. Когда миссия завершается сама, она сообщает причину: дедлайн, исчерпан капитал, достигнут лимит убытка, нет подходящей возможности, экстренная остановка.</p>
+        <h3>Nothing trades past the <em>safety gate.</em></h3>
+        <p>Every swap and bridge clears one fail-closed check before it executes, the same way whether the agent is restricted or running full autonomy. When a mission ends on its own, it reports why: deadline reached, capital depleted, max loss hit, no viable opportunity, or emergency stop.</p>
       </div>
       <div class="article-card">
-        <div class="article-num">Статья II</div>
+        <div class="article-num">Article II</div>
         <div class="article-glyph">// PROVE</div>
-        <h3>Каждое решение оставляет <em>запись.</em></h3>
-        <p>Победы, убытки и заблокированные попытки попадают в один и тот же локальный журнал, хэшированный для дедупликации, а не для показухи. Никаких скриншотов, никакого отобранного хайлайта — и ваша стратегия остаётся приватной.</p>
+        <h3>Every decision leaves a <em>record.</em></h3>
+        <p>Wins, losses, and blocked attempts all land in the same local log, hashed for dedup, not for show. No screenshots, no cherry-picked highlight reel, and your strategy stays private.</p>
       </div>
       <div class="article-card">
-        <div class="article-num">Статья III</div>
+        <div class="article-num">Article III</div>
         <div class="article-glyph">// LOCAL</div>
-        <h3>Ваши ключи никогда не покидают <em>вашу машину.</em></h3>
-        <p>Ключи шифруются в состоянии покоя AES-256-GCM и никогда не касаются сети — ни в бэкапе, ни при восстановлении, нигде. Рантайм, память и логи живут на вашем железе. Код открыт на GitHub.</p>
+        <h3>Your keys never leave <em>your machine.</em></h3>
+        <p>Keys are encrypted at rest with AES-256-GCM and never touch the network, in backup, restore, or anywhere else. Runtime, memory, and logs all live on your hardware. The code is open on GitHub.</p>
       </div>
     </div>
   </div>
@@ -789,31 +789,31 @@
 <section id="modes">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Режимы рантайма</div>
-      <h2>Четыре способа запуска.</h2>
-      <p>Каждая сессия фиксирует два переключателя: <strong>agent или mission</strong>, и <strong>restricted или full</strong>. Разрешения задаются на сессию и не могут расшириться на ходу; неотвеченное подтверждение истекает через час, и миссия продолжает без него.</p>
+      <div class="section-eyebrow">How it runs</div>
+      <h2>Four ways to run it.</h2>
+      <p>Every session locks two switches: <strong>agent or mission</strong>, and <strong>restricted or full</strong>. Permission is set per session and cannot widen mid-run; an unanswered approval expires in an hour and the mission moves on without it.</p>
     </div>
 
     <div class="modes-grid reveal">
       <div class="mode-card">
         <div class="mode-tags"><span class="tag">Agent</span><span class="tag off">Restricted</span></div>
         <h4>Agent · Restricted</h4>
-        <p>Спросил, дождался вашего подтверждения одним касанием, сделал. Всё, что двигает деньги, ставится на паузу. Режим по умолчанию.</p>
+        <p>Ask, approve, done. Anything that would move money pauses for your one-tap approval. The default.</p>
       </div>
       <div class="mode-card">
         <div class="mode-tags"><span class="tag">Agent</span><span class="tag on">Full</span></div>
         <h4>Agent · Full</h4>
-        <p>Спросил и сразу действует. Та же разовая задача, но без паузы на подтверждение — вы меняете касание на скорость.</p>
+        <p>Ask and it acts. Same one-shot task, no pause. You trade the tap for speed.</p>
       </div>
       <div class="mode-card">
         <div class="mode-tags"><span class="tag">Mission</span><span class="tag off">Restricted</span></div>
         <h4>Mission · Restricted</h4>
-        <p>Автономия на поводке. Планирует и исследует свободно; в момент, когда нужно подписать транзакцию — останавливается и ждёт вас.</p>
+        <p>Autonomy on a leash. It plans and researches freely; the moment it wants to sign, it parks and waits for you.</p>
       </div>
       <div class="mode-card">
         <div class="mode-tags"><span class="tag">Mission</span><span class="tag on">Full</span></div>
         <h4>Mission · Full</h4>
-        <p>Работает всю длительность миссии без запросов подтверждения. Шлюз безопасности для свопов и мостов пропустить всё равно нельзя, и причина остановки всегда сообщается.</p>
+        <p>Runs for the mission's full duration with no approval prompts. It still can't skip the swap and bridge safety gate, and it still reports its own stop reason when it ends.</p>
       </div>
     </div>
   </div>
@@ -822,36 +822,36 @@
 <section id="memory">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Биологическая память</div>
-      <h2>Запоминает уроки, а не балансы.</h2>
+      <div class="section-eyebrow">Biological memory</div>
+      <h2>It remembers the lessons, not the balances.</h2>
     </div>
 
     <div class="memory-wrap reveal">
       <div class="memory-tiers">
         <div class="tier">
           <div>
-            <div class="t-name">Краткосрочная</div>
-            <div class="t-desc">Контекст текущей миссии</div>
+            <div class="t-name">Short-term</div>
+            <div class="t-desc">Live mission context</div>
           </div>
           <div class="t-decay">LIVE SESSION</div>
         </div>
         <div class="tier">
           <div>
-            <div class="t-name">Среднесрочная</div>
-            <div class="t-desc">Паттерны, ожидающие подтверждения</div>
+            <div class="t-name">Mid-term</div>
+            <div class="t-desc">Patterns pending confirmation</div>
           </div>
           <div class="t-decay">HALF-LIFE 30D</div>
         </div>
         <div class="tier">
           <div>
-            <div class="t-name">Долгосрочная</div>
-            <div class="t-desc">Уроки, одобренные локальным судьёй</div>
+            <div class="t-name">Long-term</div>
+            <div class="t-desc">Lessons promoted by the local judge</div>
           </div>
           <div class="t-decay">PERSISTENT</div>
         </div>
       </div>
       <div class="memory-note">
-        <p>Три уровня памяти, эмбеддинги хранятся локально. Сила урока уменьшается вдвое каждые 30 дней и никогда не исчезает полностью. <strong>Локальный судья</strong> решает, что повышается до долгосрочной памяти — и делает это fail-closed: если вердикт сломан, не повышается ничего. Ключи и seed-фразы вымарываются до того, как что-либо записывается; в память они не попадают вовсе.</p>
+        <p>Three memory tiers, embedded and stored locally. A lesson's strength halves every 30 days and never fully fades; a <strong>local judge</strong> decides what gets promoted to long-term memory, and it fails closed — a broken verdict promotes nothing. Keys and seed phrases are redacted before anything is written; they never enter memory.</p>
       </div>
     </div>
   </div>
@@ -860,9 +860,9 @@
 <section id="download">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Получить рантайм</div>
-      <h2>Поставьте это на свою машину.</h2>
-      <p>Бесплатно и с открытым кодом. macOS и Linux уже сегодня, Windows скоро. Ключи остаются локальными, исполнение никогда не касается облака.</p>
+      <div class="section-eyebrow">Download</div>
+      <h2>Put it on your machine.</h2>
+      <p>Free and open source. macOS and Linux today, Windows soon. Your keys stay local and execution never touches a cloud.</p>
     </div>
 
     <div class="download-grid reveal">
@@ -871,28 +871,28 @@
           <div class="os-name">macOS</div>
           <div class="os-file">Apple Silicon · .dmg</div>
         </div>
-        <a href="#" class="os-dl">Скачать ↓</a>
+        <a href="#" class="os-dl">Download ↓</a>
       </div>
       <div class="os-card">
         <div>
           <div class="os-name">macOS</div>
           <div class="os-file">Intel · .dmg</div>
         </div>
-        <a href="#" class="os-dl">Скачать ↓</a>
+        <a href="#" class="os-dl">Download ↓</a>
       </div>
       <div class="os-card">
         <div>
           <div class="os-name">Linux</div>
           <div class="os-file">Universal · .AppImage</div>
         </div>
-        <a href="#" class="os-dl">Скачать ↓</a>
+        <a href="#" class="os-dl">Download ↓</a>
       </div>
       <div class="os-card">
         <div>
           <div class="os-name">Linux</div>
           <div class="os-file">Debian / Ubuntu · .deb</div>
         </div>
-        <a href="#" class="os-dl">Скачать ↓</a>
+        <a href="#" class="os-dl">Download ↓</a>
       </div>
     </div>
   </div>
@@ -902,21 +902,21 @@
   <div class="wrap">
     <div class="section-head reveal">
       <div class="section-eyebrow">$VEX · Robinhood Chain · via Virtuals</div>
-      <h2>Приложение — продукт. Токен — двигатель сети.</h2>
-      <p>Комиссии с торгов выкупают $VEX, а верифицированные трек-рекорды становятся сетью, за которой можно следовать: люди и агенты копируют стратегии в рамках своих лимитов.</p>
+      <h2>The app is the product. The token powers the network.</h2>
+      <p>Trading fees buy back $VEX, and verified track records are becoming a followable network: humans and agents copying strategies inside their own limits.</p>
     </div>
 
     <div class="token-panel panel reveal">
       <div class="token-top">
         <div class="token-stats">
           <div class="stat"><div class="label">FDV</div><div class="value">—</div></div>
-          <div class="stat"><div class="label">Ликвидность</div><div class="value">—</div></div>
+          <div class="stat"><div class="label">Liquidity</div><div class="value">—</div></div>
           <div class="stat"><div class="label">Chain ID</div><div class="value">4663</div></div>
         </div>
         <div class="token-actions">
-          <a href="#" class="btn btn-primary btn-sm">Купить на Virtuals ↗</a>
-          <a href="#" class="btn btn-ghost btn-sm">График ↗</a>
-          <a href="#" class="btn btn-ghost btn-sm">Обозреватель ↗</a>
+          <a href="#" class="btn btn-primary btn-sm">Buy on Virtuals ↗</a>
+          <a href="#" class="btn btn-ghost btn-sm">Chart ↗</a>
+          <a href="#" class="btn btn-ghost btn-sm">Explorer ↗</a>
         </div>
       </div>
 
@@ -927,7 +927,7 @@
       </div>
 
       <div class="token-disclaimer">
-        $VEX — utility-токен. Ничто на этой странице не является финансовым советом или предложением ценных бумаг. Доверяйте только адресу контракта, опубликованному официальным аккаунтом проекта.
+        $VEX is a utility token. Nothing on this page is financial advice or an offer of securities. Only trust the contract address posted by the official project account.
       </div>
     </div>
   </div>
@@ -936,30 +936,30 @@
 <section id="faq">
   <div class="wrap">
     <div class="section-head reveal">
-      <div class="section-eyebrow">Ответы</div>
-      <h2>Вопросы, которые решают доверие.</h2>
+      <div class="section-eyebrow">Answers</div>
+      <h2>The questions that decide trust.</h2>
     </div>
 
     <div class="reveal">
       <div class="faq-item">
-        <div class="faq-q"><h4><span class="qnum">01</span>Может ли VEX двигать средства без меня?</h4><span class="faq-toggle">+</span></div>
-        <div class="faq-a"><p>Нет. Модель может только предлагать. Каждое действие, меняющее состояние, проходит fail-closed шлюз безопасности перед исполнением, а в ограниченном режиме ничего не подписывается без вашего одобрения. Неотвеченный запрос истекает через час, и миссия продолжает без него.</p></div>
+        <div class="faq-q"><h4><span class="qnum">01</span>Can VEX move funds without me?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>No. The model can only propose. Every state-changing action clears a fail-closed safety gate before it executes, and in restricted mode nothing signs until you approve it. An unanswered approval expires in an hour and the mission moves on without it.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><h4><span class="qnum">02</span>Где хранятся мои приватные ключи?</h4><span class="faq-toggle">+</span></div>
-        <div class="faq-a"><p>На вашей машине, никогда не передаются VEX. Ключи шифруются AES-256-GCM в состоянии покоя и используются только на границе подписания, после прохождения шлюза. Ни облачного релея, ни кастодиального сервера.</p></div>
+        <div class="faq-q"><h4><span class="qnum">02</span>Where do my private keys live?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>On your machine, never transmitted to VEX. Keys are encrypted at rest with AES-256-GCM and used only at the signing boundary, after an action clears the safety gate. No cloud relay, no custodial server, no remote key escrow.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><h4><span class="qnum">03</span>Есть ли зависимость от облака?</h4><span class="faq-toggle">+</span></div>
-        <div class="faq-a"><p>Нет. VEX — нативное десктопное приложение. Рантайм, память, журналы аудита и кастодия — всё живёт локально. Исходящие вызовы идут только к протоколам и эндпоинтам моделей, которые вы явно включили.</p></div>
+        <div class="faq-q"><h4><span class="qnum">03</span>Is any of this cloud-dependent?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>No. VEX is a native desktop app. Runtime, memory, audit logs, and custody all live locally. The only outbound calls are the protocol and model endpoints you explicitly enable.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><h4><span class="qnum">04</span>Где купить $VEX?</h4><span class="faq-toggle">+</span></div>
-        <div class="faq-a"><p>Через Virtuals Protocol на Robinhood Chain — кнопка «Купить» на этой странице ведёт к официальному листингу. Сверьте адрес контракта перед сделкой; если ссылка пришла не с этого сайта — считайте её поддельной.</p></div>
+        <div class="faq-q"><h4><span class="qnum">04</span>Where do I buy $VEX?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>Through Virtuals Protocol on Robinhood Chain — the Buy button on this page goes to the official listing. Verify the contract address before you trade; if a link did not come from this site, treat it as fake.</p></div>
       </div>
       <div class="faq-item">
-        <div class="faq-q"><h4><span class="qnum">05</span>Для чего нужен токен?</h4><span class="faq-toggle">+</span></div>
-        <div class="faq-a"><p>$VEX питает сеть вокруг рантайма: комиссии с торгов выкупают токен, а верифицированные трек-рекорды становятся сетью для копирования стратегий. Продуктом при этом остаётся само приложение.</p></div>
+        <div class="faq-q"><h4><span class="qnum">05</span>What is the token for?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>$VEX powers the network around the runtime: trading fees buy back $VEX, and verified track records are becoming a followable network for copying strategies. The app itself stays the product.</p></div>
       </div>
     </div>
   </div>
@@ -967,10 +967,10 @@
 
 <section class="final-cta">
   <div class="wrap">
-    <h2 class="reveal">Ваш ИИ. Ваши лимиты.<br><em>Ваши доказательства.</em></h2>
+    <h2 class="reveal">Your AI. Your limits.<br><em>Your receipts.</em></h2>
     <div class="final-actions reveal">
-      <a href="#download" class="btn btn-primary">Скачать VEX</a>
-      <a href="#" class="btn btn-ghost">Подписаться на обновления ↗</a>
+      <a href="#download" class="btn btn-primary">Download VEX</a>
+      <a href="#" class="btn btn-ghost">Follow for updates ↗</a>
     </div>
   </div>
 </section>
@@ -980,7 +980,7 @@
     <div class="footer-inner">
       <div class="footer-brand">© 2026 VEX // MODELS REASON. RUNTIMES ENFORCE. LOGS RECORD.</div>
       <div class="footer-links">
-        <a href="#download">Скачать</a>
+        <a href="#download">Download</a>
         <a href="#token">$VEX</a>
         <a href="#">Docs</a>
         <a href="#">Releases</a>
