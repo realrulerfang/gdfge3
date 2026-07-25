@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VEX — Enforce AI Trades. Prove Every Action.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script type="module" src="https://unpkg.com/@splinetool/viewer@1.12.98/build/spline-viewer.js"></script>
+<style>
+  :root{
+    --bg:#04050a;
+    --ink:#EAEEF6;
+    --muted:#8A93A6;
+    --muted-2:#5C6478;
+    --panel:rgba(10,13,22,0.52);
+    --panel-solid:#0A0D16;
+    --border:rgba(234,238,246,0.10);
+    --border-strong:rgba(234,238,246,0.18);
+    --amber:#FF8A3D;
+    --amber-dim:rgba(255,138,61,0.14);
+    --cyan:#57E0E8;
+    --green:#6EE7A0;
+    --red:#FF5C5C;
+    --radius:2px;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'IBM Plex Mono', monospace;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    line-height:1.5;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== SPLINE BACKGROUND ===== */
+  #spline-bg{
+    position:fixed;
+    inset:0;
+    width:100vw;
+    height:100vh;
+    z-index:-2;
+    pointer-events:none;
+  }
+  spline-viewer{
+    width:100%;
+    height:100%;
+    display:block;
+  }
+  #bg-veil{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(4,5,10,0.15), rgba(4,5,10,0.75) 55%),
+      linear-gradient(180deg, rgba(4,5,10,0.35) 0%, rgba(4,5,10,0.15) 20%, rgba(4,5,10,0.55) 70%, var(--bg) 100%);
+  }
+  #grid-overlay{
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    opacity:0.35;
+    background-image:
+      linear-gradient(rgba(234,238,246,0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(234,238,246,0.035) 1px, transparent 1px);
+    background-size:64px 64px;
+    mask-image:radial-gradient(ellipse 80% 60% at 50% 20%, black, transparent 75%);
+  }
+
+  ::selection{background:var(--amber);color:#1a1000;}
+
+  a{color:inherit;text-decoration:none;}
+  .mono{font-family:var(--font-mono);}
+
+  .wrap{
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px;
+  }
+
+  /* ===== NAV ===== */
+  header{
+    position:fixed;
+    top:0;left:0;right:0;
+    z-index:100;
+    background:rgba(4,5,10,0.55);
+    backdrop-filter:blur(14px) saturate(140%);
+    -webkit-backdrop-filter:blur(14px) saturate(140%);
+    border-bottom:1px solid var(--border);
+  }
+  nav{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 32px;
+    max-width:1180px;
+    margin:0 auto;
+  }
+  .brand{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:19px;
+    letter-spacing:0.02em;
+  }
+  .brand-dot{
+    width:8px;height:8px;
+    border-radius:50%;
+    background:var(--amber);
+    box-shadow:0 0 8px var(--amber), 0 0 16px rgba(255,138,61,0.5);
+    animation:pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;transform:scale(1);}
+    50%{opacity:0.5;transform:scale(0.8);}
+  }
+  .nav-links{
+    display:flex;
+    align-items:center;
+    gap:28px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .nav-links a{transition:color 0.2s;}
+  .nav-links a:hover{color:var(--ink);}
+  .nav-cta{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  @media(max-width:860px){ .nav-links{display:none;} }
+
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:11px 20px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    font-weight:500;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    border-radius:var(--radius);
+    border:1px solid var(--border-strong);
+    transition:all 0.2s ease;
+    white-space:nowrap;
+    cursor:pointer;
+  }
+  .btn-primary{
+    background:var(--amber);
+    color:#1a0f05;
+    border-color:var(--amber);
+    font-weight:600;
+  }
+  .btn-primary:hover{
+    background:#ffa563;
+    box-shadow:0 0 24px rgba(255,138,61,0.35);
+  }
+  .btn-ghost{
+    background:rgba(255,255,255,0.02);
+    color:var(--ink);
+  }
+  .btn-ghost:hover{
+    border-color:var(--border-strong);
+    background:rgba(255,255,255,0.06);
+  }
+  .btn-sm{padding:8px 14px;font-size:11.5px;}
+
+  /* ===== HERO ===== */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:140px 32px 80px;
+    position:relative;
+  }
+  .hud-corner{
+    position:absolute;
+    width:28px;height:28px;
+    border:1px solid var(--border-strong);
+    opacity:0.6;
+  }
+  .hud-corner.tl{top:100px;left:32px;border-right:none;border-bottom:none;}
+  .hud-corner.tr{top:100px;right:32px;border-left:none;border-bottom:none;}
+  .hud-corner.bl{bottom:40px;left:32px;border-right:none;border-top:none;}
+  .hud-corner.br{bottom:40px;right:32px;border-left:none;border-top:none;}
+  @media(max-width:768px){ .hud-corner{display:none;} }
+
+  .eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+    padding:7px 14px;
+    border:1px solid var(--border-strong);
+    border-radius:100px;
+    background:var(--panel);
+    backdrop-filter:blur(10px);
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-bottom:32px;
+  }
+  .eyebrow .live-dot{
+    width:6px;height:6px;
+    border-radius:50%;
+    background:var(--green);
+    box-shadow:0 0 6px var(--green);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  .hero h1{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(38px, 6.5vw, 78px);
+    line-height:1.04;
+    letter-spacing:-0.01em;
+    max-width:920px;
+    margin-bottom:26px;
+  }
+  .hero h1 .accent{color:var(--amber);}
+  .hero-sub{
+    font-size:17.5px;
+    color:var(--muted);
+    max-width:600px;
+    line-height:1.65;
+    margin-bottom:40px;
+  }
+  .hero-actions{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin-bottom:36px;
+  }
+  .hero-meta{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted-2);
+    display:flex;
+    gap:10px;
+    align-items:center;
+    flex-wrap:wrap;
+    justify-content:center;
+    letter-spacing:0.02em;
+  }
+  .hero-meta span.sep{opacity:0.4;}
+  .hero-meta a{color:var(--muted);border-bottom:1px dotted var(--border-strong);}
+  .hero-meta a:hover{color:var(--ink);}
+
+  /* ===== ticker ===== */
+  .ticker{
+    margin-top:56px;
+    width:100%;
+    max-width:640px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    backdrop-filter:blur(14px);
+    border-radius:var(--radius);
+    padding:14px 20px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    flex-wrap:wrap;
+    gap:10px;
+  }
+  .ticker-item{display:flex;flex-direction:column;gap:3px;align-items:flex-start;}
+  .ticker-item .label{color:var(--muted-2);font-size:10.5px;letter-spacing:0.06em;text-transform:uppercase;}
+  .ticker-item .value{color:var(--cyan);}
+
+  /* ===== SECTION GENERIC ===== */
+  section{
+    position:relative;
+    padding:120px 0;
+  }
+  .section-head{
+    max-width:680px;
+    margin-bottom:64px;
+  }
+  .section-eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--amber);
+    margin-bottom:16px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .section-eyebrow::before{
+    content:'';
+    width:22px;height:1px;
+    background:var(--amber);
+  }
+  .section-head h2{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(28px,3.6vw,42px);
+    line-height:1.15;
+    letter-spacing:-0.01em;
+    margin-bottom:18px;
+  }
+  .section-head p{
+    color:var(--muted);
+    font-size:16px;
+    line-height:1.7;
+  }
+
+  .panel{
+    background:var(--panel);
+    backdrop-filter:blur(16px) saturate(140%);
+    -webkit-backdrop-filter:blur(16px) saturate(140%);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+  }
+
+  .reveal{
+    opacity:0;
+    transform:translateY(24px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in{opacity:1;transform:translateY(0);}
+
+  /* ===== ARTICLES (What VEX is) ===== */
+  .articles{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  @media(max-width:860px){ .articles{grid-template-columns:1fr;} }
+  .article-card{
+    background:var(--panel-solid);
+    padding:36px 32px;
+    position:relative;
+  }
+  .article-num{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:0.1em;
+    color:var(--muted-2);
+    text-transform:uppercase;
+    margin-bottom:24px;
+  }
+  .article-glyph{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--amber);
+    margin-bottom:10px;
+    letter-spacing:0.06em;
+  }
+  .article-card h3{
+    font-family:var(--font-display);
+    font-size:23px;
+    font-weight:600;
+    line-height:1.3;
+    margin-bottom:14px;
+  }
+  .article-card h3 em{color:var(--amber);font-style:normal;}
+  .article-card p{
+    color:var(--muted);
+    font-size:14.5px;
+    line-height:1.7;
+  }
+
+  /* ===== MODES GRID ===== */
+  .modes-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+  }
+  @media(max-width:700px){ .modes-grid{grid-template-columns:1fr;} }
+  .mode-card{
+    background:var(--panel-solid);
+    padding:32px;
+  }
+  .mode-tags{
+    display:flex;
+    gap:8px;
+    margin-bottom:18px;
+  }
+  .tag{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:4px 9px;
+    border-radius:100px;
+    border:1px solid var(--border-strong);
+    color:var(--muted);
+  }
+  .tag.on{
+    border-color:rgba(110,231,160,0.4);
+    color:var(--green);
+    background:rgba(110,231,160,0.06);
+  }
+  .tag.off{
+    border-color:rgba(255,92,92,0.35);
+    color:var(--red);
+    background:rgba(255,92,92,0.06);
+  }
+  .mode-card h4{
+    font-family:var(--font-display);
+    font-size:19px;
+    font-weight:600;
+    margin-bottom:10px;
+  }
+  .mode-card p{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.65;
+  }
+
+  /* ===== MEMORY ===== */
+  .memory-wrap{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:56px;
+    align-items:center;
+  }
+  @media(max-width:860px){ .memory-wrap{grid-template-columns:1fr;gap:40px;} }
+  .memory-tiers{display:flex;flex-direction:column;gap:14px;}
+  .tier{
+    padding:18px 22px;
+    border:1px solid var(--border);
+    background:var(--panel);
+    border-radius:var(--radius);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+  }
+  .tier .t-name{font-family:var(--font-display);font-weight:600;font-size:15.5px;}
+  .tier .t-desc{color:var(--muted);font-size:12.5px;margin-top:3px;}
+  .tier .t-decay{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--cyan);
+    text-align:right;
+    white-space:nowrap;
+  }
+  .memory-note{
+    color:var(--muted);
+    font-size:14.5px;
+    line-height:1.75;
+  }
+  .memory-note strong{color:var(--ink);font-weight:500;}
+
+  /* ===== DOWNLOAD ===== */
+  .download-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--border);
+    border:1px solid var(--border);
+  }
+  @media(max-width:900px){ .download-grid{grid-template-columns:1fr 1fr;} }
+  @media(max-width:520px){ .download-grid{grid-template-columns:1fr;} }
+  .os-card{
+    background:var(--panel-solid);
+    padding:28px 24px;
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+    justify-content:space-between;
+    min-height:150px;
+  }
+  .os-card.soon{opacity:0.5;}
+  .os-name{font-family:var(--font-display);font-weight:600;font-size:16.5px;}
+  .os-file{font-family:var(--font-mono);font-size:11.5px;color:var(--muted-2);}
+  .os-dl{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--amber);
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+
+  /* ===== TOKEN ===== */
+  .token-panel{
+    padding:44px;
+    display:flex;
+    flex-direction:column;
+    gap:28px;
+  }
+  @media(max-width:640px){ .token-panel{padding:26px;} }
+  .token-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    flex-wrap:wrap;
+    gap:20px;
+  }
+  .token-stats{
+    display:flex;
+    gap:36px;
+    flex-wrap:wrap;
+  }
+  .token-stats .stat .label{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted-2);
+    margin-bottom:6px;
+  }
+  .token-stats .stat .value{
+    font-family:var(--font-mono);
+    font-size:20px;
+    color:var(--cyan);
+  }
+  .contract-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px 18px;
+    background:rgba(255,255,255,0.02);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    flex-wrap:wrap;
+  }
+  .contract-row .label{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted-2);
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+  }
+  .contract-row code{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--ink);
+    flex:1;
+    min-width:180px;
+  }
+  .copy-btn{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--amber);
+    border:1px solid var(--border-strong);
+    padding:6px 12px;
+    border-radius:var(--radius);
+    cursor:pointer;
+    background:transparent;
+    transition:all 0.2s;
+  }
+  .copy-btn:hover{background:var(--amber-dim);}
+  .token-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .token-disclaimer{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--muted-2);
+    line-height:1.7;
+    border-top:1px solid var(--border);
+    padding-top:20px;
+  }
+
+  /* ===== FAQ ===== */
+  .faq-item{
+    border-bottom:1px solid var(--border);
+    padding:26px 0;
+    cursor:pointer;
+  }
+  .faq-item:first-child{border-top:1px solid var(--border);}
+  .faq-q{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:20px;
+  }
+  .faq-q .qnum{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--amber);
+    margin-right:14px;
+  }
+  .faq-q h4{
+    font-family:var(--font-display);
+    font-size:17px;
+    font-weight:500;
+    flex:1;
+  }
+  .faq-toggle{
+    font-family:var(--font-mono);
+    font-size:18px;
+    color:var(--muted);
+    transition:transform 0.25s;
+    flex-shrink:0;
+  }
+  .faq-item.open .faq-toggle{transform:rotate(45deg);color:var(--amber);}
+  .faq-a{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.35s ease, margin-top 0.35s ease;
+  }
+  .faq-item.open .faq-a{max-height:200px;margin-top:16px;}
+  .faq-a p{
+    color:var(--muted);
+    font-size:14.5px;
+    line-height:1.75;
+    max-width:680px;
+    padding-left:30px;
+  }
+
+  /* ===== FINAL CTA ===== */
+  .final-cta{
+    text-align:center;
+    padding:140px 0 100px;
+  }
+  .final-cta h2{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(30px,4.5vw,52px);
+    margin-bottom:36px;
+    line-height:1.15;
+  }
+  .final-cta h2 em{color:var(--amber);font-style:normal;}
+  .final-actions{
+    display:flex;
+    gap:14px;
+    justify-content:center;
+    flex-wrap:wrap;
+  }
+
+  /* ===== FOOTER ===== */
+  footer{
+    border-top:1px solid var(--border);
+    padding:36px 0;
+  }
+  .footer-inner{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  .footer-brand{
+    font-family:var(--font-mono);
+    font-size:12px;
+    color:var(--muted-2);
+    letter-spacing:0.02em;
+  }
+  .footer-links{
+    display:flex;
+    gap:22px;
+    flex-wrap:wrap;
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:0.04em;
+  }
+  .footer-links a:hover{color:var(--ink);}
+  .footer-note{
+    font-family:var(--font-mono);
+    font-size:11px;
+    color:var(--muted-2);
+    text-align:center;
+    margin-top:20px;
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<div id="spline-bg">
+  <spline-viewer url="https://prod.spline.design/7U0z-lNnph5WeZA0/scene.splinecode"></spline-viewer>
+</div>
+<div id="bg-veil"></div>
+<div id="grid-overlay"></div>
+
+<header>
+  <nav>
+    <div class="brand"><span class="brand-dot"></span>VEX</div>
+    <div class="nav-links">
+      <a href="#what">Система</a>
+      <a href="#modes">Режимы</a>
+      <a href="#memory">Память</a>
+      <a href="#token">$VEX</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div class="nav-cta">
+      <a href="#token" class="btn btn-ghost btn-sm">$VEX</a>
+      <a href="#download" class="btn btn-primary btn-sm">Скачать</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hud-corner tl"></div>
+  <div class="hud-corner tr"></div>
+  <div class="hud-corner bl"></div>
+  <div class="hud-corner br"></div>
+
+  <div class="eyebrow"><span class="live-dot"></span>$VEX LIVE · ROBINHOOD CHAIN · VIA VIRTUALS</div>
+
+  <h1>Хватит нянчиться с каждой сделкой.<br><span class="accent">Шлюз безопасности не уходит на перерыв.</span></h1>
+
+  <p class="hero-sub">Торговый рантайм, который живёт на вашей машине. Режим «миссии» работает без присмотра сутками — но каждый своп и мост проходят один и тот же fail-closed шлюз, всегда.</p>
+
+  <div class="hero-actions">
+    <a href="#download" class="btn btn-primary">Скачать для macOS / Linux</a>
+    <a href="#token" class="btn btn-ghost">Купить $VEX ↗</a>
+  </div>
+
+  <div class="hero-meta">
+    <a href="#">Свободный и open source ↗</a>
+    <span class="sep">·</span>
+    <a href="#">Запущен через Virtuals</a>
+    <span class="sep">·</span>
+    <a href="#">Robinhood Chain</a>
+  </div>
+
+  <div class="ticker panel">
+    <div class="ticker-item">
+      <span class="label">Gate status</span>
+      <span class="value mono">FAIL-CLOSED · ARMED</span>
+    </div>
+    <div class="ticker-item">
+      <span class="label">Keys</span>
+      <span class="value mono">AES-256-GCM · LOCAL</span>
+    </div>
+    <div class="ticker-item">
+      <span class="label">Chain</span>
+      <span class="value mono">ID 4663</span>
+    </div>
+  </div>
+</section>
+
+<section id="what">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Архитектура системы</div>
+      <h2>Не чат-бот. Рантайм, который исполняет миссии.</h2>
+      <p>VEX запускает реальные торговые миссии на реальных рынках — по правилам, которые модель не может обойти.</p>
+    </div>
+
+    <div class="articles reveal">
+      <div class="article-card">
+        <div class="article-num">Статья I</div>
+        <div class="article-glyph">// ENFORCE</div>
+        <h3>Ничто не торгует мимо <em>шлюза безопасности.</em></h3>
+        <p>Каждый своп и мост проходят одну и ту же fail-closed проверку перед исполнением — независимо от того, ограничен агент или работает в полной автономии. Когда миссия завершается сама, она сообщает причину: дедлайн, исчерпан капитал, достигнут лимит убытка, нет подходящей возможности, экстренная остановка.</p>
+      </div>
+      <div class="article-card">
+        <div class="article-num">Статья II</div>
+        <div class="article-glyph">// PROVE</div>
+        <h3>Каждое решение оставляет <em>запись.</em></h3>
+        <p>Победы, убытки и заблокированные попытки попадают в один и тот же локальный журнал, хэшированный для дедупликации, а не для показухи. Никаких скриншотов, никакого отобранного хайлайта — и ваша стратегия остаётся приватной.</p>
+      </div>
+      <div class="article-card">
+        <div class="article-num">Статья III</div>
+        <div class="article-glyph">// LOCAL</div>
+        <h3>Ваши ключи никогда не покидают <em>вашу машину.</em></h3>
+        <p>Ключи шифруются в состоянии покоя AES-256-GCM и никогда не касаются сети — ни в бэкапе, ни при восстановлении, нигде. Рантайм, память и логи живут на вашем железе. Код открыт на GitHub.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="modes">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Режимы рантайма</div>
+      <h2>Четыре способа запуска.</h2>
+      <p>Каждая сессия фиксирует два переключателя: <strong>agent или mission</strong>, и <strong>restricted или full</strong>. Разрешения задаются на сессию и не могут расшириться на ходу; неотвеченное подтверждение истекает через час, и миссия продолжает без него.</p>
+    </div>
+
+    <div class="modes-grid reveal">
+      <div class="mode-card">
+        <div class="mode-tags"><span class="tag">Agent</span><span class="tag off">Restricted</span></div>
+        <h4>Agent · Restricted</h4>
+        <p>Спросил, дождался вашего подтверждения одним касанием, сделал. Всё, что двигает деньги, ставится на паузу. Режим по умолчанию.</p>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tags"><span class="tag">Agent</span><span class="tag on">Full</span></div>
+        <h4>Agent · Full</h4>
+        <p>Спросил и сразу действует. Та же разовая задача, но без паузы на подтверждение — вы меняете касание на скорость.</p>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tags"><span class="tag">Mission</span><span class="tag off">Restricted</span></div>
+        <h4>Mission · Restricted</h4>
+        <p>Автономия на поводке. Планирует и исследует свободно; в момент, когда нужно подписать транзакцию — останавливается и ждёт вас.</p>
+      </div>
+      <div class="mode-card">
+        <div class="mode-tags"><span class="tag">Mission</span><span class="tag on">Full</span></div>
+        <h4>Mission · Full</h4>
+        <p>Работает всю длительность миссии без запросов подтверждения. Шлюз безопасности для свопов и мостов пропустить всё равно нельзя, и причина остановки всегда сообщается.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="memory">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Биологическая память</div>
+      <h2>Запоминает уроки, а не балансы.</h2>
+    </div>
+
+    <div class="memory-wrap reveal">
+      <div class="memory-tiers">
+        <div class="tier">
+          <div>
+            <div class="t-name">Краткосрочная</div>
+            <div class="t-desc">Контекст текущей миссии</div>
+          </div>
+          <div class="t-decay">LIVE SESSION</div>
+        </div>
+        <div class="tier">
+          <div>
+            <div class="t-name">Среднесрочная</div>
+            <div class="t-desc">Паттерны, ожидающие подтверждения</div>
+          </div>
+          <div class="t-decay">HALF-LIFE 30D</div>
+        </div>
+        <div class="tier">
+          <div>
+            <div class="t-name">Долгосрочная</div>
+            <div class="t-desc">Уроки, одобренные локальным судьёй</div>
+          </div>
+          <div class="t-decay">PERSISTENT</div>
+        </div>
+      </div>
+      <div class="memory-note">
+        <p>Три уровня памяти, эмбеддинги хранятся локально. Сила урока уменьшается вдвое каждые 30 дней и никогда не исчезает полностью. <strong>Локальный судья</strong> решает, что повышается до долгосрочной памяти — и делает это fail-closed: если вердикт сломан, не повышается ничего. Ключи и seed-фразы вымарываются до того, как что-либо записывается; в память они не попадают вовсе.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="download">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Получить рантайм</div>
+      <h2>Поставьте это на свою машину.</h2>
+      <p>Бесплатно и с открытым кодом. macOS и Linux уже сегодня, Windows скоро. Ключи остаются локальными, исполнение никогда не касается облака.</p>
+    </div>
+
+    <div class="download-grid reveal">
+      <div class="os-card">
+        <div>
+          <div class="os-name">macOS</div>
+          <div class="os-file">Apple Silicon · .dmg</div>
+        </div>
+        <a href="#" class="os-dl">Скачать ↓</a>
+      </div>
+      <div class="os-card">
+        <div>
+          <div class="os-name">macOS</div>
+          <div class="os-file">Intel · .dmg</div>
+        </div>
+        <a href="#" class="os-dl">Скачать ↓</a>
+      </div>
+      <div class="os-card">
+        <div>
+          <div class="os-name">Linux</div>
+          <div class="os-file">Universal · .AppImage</div>
+        </div>
+        <a href="#" class="os-dl">Скачать ↓</a>
+      </div>
+      <div class="os-card">
+        <div>
+          <div class="os-name">Linux</div>
+          <div class="os-file">Debian / Ubuntu · .deb</div>
+        </div>
+        <a href="#" class="os-dl">Скачать ↓</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="token">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">$VEX · Robinhood Chain · via Virtuals</div>
+      <h2>Приложение — продукт. Токен — двигатель сети.</h2>
+      <p>Комиссии с торгов выкупают $VEX, а верифицированные трек-рекорды становятся сетью, за которой можно следовать: люди и агенты копируют стратегии в рамках своих лимитов.</p>
+    </div>
+
+    <div class="token-panel panel reveal">
+      <div class="token-top">
+        <div class="token-stats">
+          <div class="stat"><div class="label">FDV</div><div class="value">—</div></div>
+          <div class="stat"><div class="label">Ликвидность</div><div class="value">—</div></div>
+          <div class="stat"><div class="label">Chain ID</div><div class="value">4663</div></div>
+        </div>
+        <div class="token-actions">
+          <a href="#" class="btn btn-primary btn-sm">Купить на Virtuals ↗</a>
+          <a href="#" class="btn btn-ghost btn-sm">График ↗</a>
+          <a href="#" class="btn btn-ghost btn-sm">Обозреватель ↗</a>
+        </div>
+      </div>
+
+      <div class="contract-row">
+        <span class="label">Contract</span>
+        <code id="contract-addr">0x8Ff92566f2e81BDd68EDfAa8cde73942A723796b</code>
+        <button class="copy-btn" onclick="copyContract()">Copy</button>
+      </div>
+
+      <div class="token-disclaimer">
+        $VEX — utility-токен. Ничто на этой странице не является финансовым советом или предложением ценных бумаг. Доверяйте только адресу контракта, опубликованному официальным аккаунтом проекта.
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head reveal">
+      <div class="section-eyebrow">Ответы</div>
+      <h2>Вопросы, которые решают доверие.</h2>
+    </div>
+
+    <div class="reveal">
+      <div class="faq-item">
+        <div class="faq-q"><h4><span class="qnum">01</span>Может ли VEX двигать средства без меня?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>Нет. Модель может только предлагать. Каждое действие, меняющее состояние, проходит fail-closed шлюз безопасности перед исполнением, а в ограниченном режиме ничего не подписывается без вашего одобрения. Неотвеченный запрос истекает через час, и миссия продолжает без него.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><h4><span class="qnum">02</span>Где хранятся мои приватные ключи?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>На вашей машине, никогда не передаются VEX. Ключи шифруются AES-256-GCM в состоянии покоя и используются только на границе подписания, после прохождения шлюза. Ни облачного релея, ни кастодиального сервера.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><h4><span class="qnum">03</span>Есть ли зависимость от облака?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>Нет. VEX — нативное десктопное приложение. Рантайм, память, журналы аудита и кастодия — всё живёт локально. Исходящие вызовы идут только к протоколам и эндпоинтам моделей, которые вы явно включили.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><h4><span class="qnum">04</span>Где купить $VEX?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>Через Virtuals Protocol на Robinhood Chain — кнопка «Купить» на этой странице ведёт к официальному листингу. Сверьте адрес контракта перед сделкой; если ссылка пришла не с этого сайта — считайте её поддельной.</p></div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q"><h4><span class="qnum">05</span>Для чего нужен токен?</h4><span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>$VEX питает сеть вокруг рантайма: комиссии с торгов выкупают токен, а верифицированные трек-рекорды становятся сетью для копирования стратегий. Продуктом при этом остаётся само приложение.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  <div class="wrap">
+    <h2 class="reveal">Ваш ИИ. Ваши лимиты.<br><em>Ваши доказательства.</em></h2>
+    <div class="final-actions reveal">
+      <a href="#download" class="btn btn-primary">Скачать VEX</a>
+      <a href="#" class="btn btn-ghost">Подписаться на обновления ↗</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-brand">© 2026 VEX // MODELS REASON. RUNTIMES ENFORCE. LOGS RECORD.</div>
+      <div class="footer-links">
+        <a href="#download">Скачать</a>
+        <a href="#token">$VEX</a>
+        <a href="#">Docs</a>
+        <a href="#">Releases</a>
+        <a href="#">GitHub ↗</a>
+      </div>
+    </div>
+    <div class="footer-note">Not financial advice. Verify the CA via official channels only.</div>
+  </div>
+</footer>
+
+<script>
+  // Reveal on scroll
+  const revealEls = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold:0.12});
+  revealEls.forEach(el=>io.observe(el));
+
+  // FAQ accordion
+  document.querySelectorAll('.faq-item').forEach(item=>{
+    item.addEventListener('click', ()=>{
+      const wasOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+      if(!wasOpen) item.classList.add('open');
+    });
+  });
+
+  // Copy contract
+  function copyContract(){
+    const text = document.getElementById('contract-addr').textContent;
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn = document.querySelector('.copy-btn');
+      const original = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(()=>{ btn.textContent = original; }, 1500);
+    });
+  }
+</script>
+
+</body>
+</html>
